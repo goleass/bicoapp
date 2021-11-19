@@ -1,0 +1,41 @@
+.trigger {
+  padding: 0 24px;
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.trigger:hover {
+  color: #1890ff;
+}
+
+.logo-header {
+  padding: 0 0.8em 0 0.8em;
+   font-size: 1.4em;
+   color: #FFBB33;
+   font-weight: bold;
+   background-color: #031D35;
+}
+
+.wellcome-header {
+  padding: 0 0.8em 0 0.8em;
+   font-size: 1em;
+   color: #FFF;
+   font-weight: bold;
+}
+.logo {
+   padding: 16px;
+   font-size: 1.4em;
+   color: #FFBB33;
+   font-weight: bold;
+   background-color: #031D35;
+}
+
+.site-layout .site-layout-background {
+  background: #001529;
+}
+
+.site-layout .site-layout-background-content {
+  background: #FFF;
+}
