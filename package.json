@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "start": "vite preview"
   },
   "dependencies": {
     "antd": "^4.16.13",
