@@ -72,12 +72,7 @@ export const Skill = () => {
           </Col>
         </Row>
       }>
-      <list>
-        <ul>
-          <li>Reparos</li>
-          <li>Móveis</li>
-        </ul>
-      </list>
+      <p>- Manutenção</p>
     </Card>)
   }
 
@@ -103,7 +98,7 @@ export const Skill = () => {
           <h1 style={{ color: "#6C6969", fontSize: "16pt" }}>Minhas Habilidades</h1>
         </Col>
         <Col>
-          <Button onClick={showModal} size="lg" style={{ right: '2em', position: "fixed", zIndex: 1, float: "right" }} type="primary">Adiconar</Button>
+          <Button onClick={showModal} style={{ right: '2em', position: "fixed", zIndex: 1, float: "right" }} type="primary">Adiconar</Button>
         </Col>
       </Row>
       <Row gutter={[10, 10]}>
