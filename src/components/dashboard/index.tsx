@@ -10,6 +10,7 @@ import {
 
 import { useAuth } from '../../context/AuthProvider/useAuth';
 import { Profile } from '../Profile';
+import { ContractService } from '../ContractService';
 import { Skill } from '../Skill';
 import { Footer } from 'antd/lib/layout/layout';
 
@@ -17,6 +18,8 @@ const { Header, Sider, Content } = Layout;
 
 const componentsDashboard = [
   <Profile />,
+  <ContractService />,
+  <h1>Meus serviços</h1>,
   <Skill />
 ]
 
@@ -64,10 +67,16 @@ function Dashboard() {
             <Menu.Item key="0" onClick={handleClick} icon={<UserOutlined />}>
               Meu perfil
             </Menu.Item>
-            <Menu.Item key="1" onClick={handleClick} icon={<OrderedListOutlined />} >
+            <Menu.Item key="1" onClick={handleClick} icon={<UserOutlined />}>
+              Contratar serviço
+            </Menu.Item>
+            <Menu.Item key="2" onClick={handleClick} icon={<UserOutlined />}>
+              Meus serviços
+            </Menu.Item>
+            <Menu.Item key="3" onClick={handleClick} icon={<OrderedListOutlined />} >
               Habilidades
             </Menu.Item>
-            <Menu.Item key="2" icon={<LogoutOutlined />} onClick={() => logout()}>
+            <Menu.Item key="4" icon={<LogoutOutlined />} onClick={() => logout()}>
               Sair
             </Menu.Item>
           </Menu>
