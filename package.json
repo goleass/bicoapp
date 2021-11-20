@@ -2,13 +2,14 @@
   "name": "bicoapp",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "vite",
     "build": "tsc && vite build",
-    "start": "vite preview"
+    "serve": "npm run build && vite preview"
   },
   "dependencies": {
     "antd": "^4.16.13",
     "axios": "^0.24.0",
+    "env-cmd": "^10.1.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-router-dom": "^6.0.2"
