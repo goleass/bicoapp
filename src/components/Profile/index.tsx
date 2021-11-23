@@ -1,20 +1,170 @@
-import { Select, Avatar, Card, Col, Row, Form, Input, Divider, Descriptions, Button } from "antd"
+import { Select, Avatar, Card, Col, Row, Form, Input, Divider, Descriptions, Button, message } from "antd"
 import { UserOutlined } from '@ant-design/icons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthProvider/useAuth"
+import { Api, ApiLocate } from "../../services/api"
+import { getUserLocalStorage } from "../../context/AuthProvider/util";
 
 const { Option } = Select
 
 export const Profile = () => {
+  const { email, setUserU } = useAuth()
   const [editPersonalInfo, setEditPersonalInfo] = useState(false)
-  const [editAccountInfo, setEditAccountInfo] = useState(false)
+  const [editPassword, setEditPassword] = useState(false)
   const [editAddressInfo, setEditAddressInfo] = useState(false)
   const [editCellPhoneInfo, setEditCellPhoneInfo] = useState(false)
+  const [states, setStates] = useState([])
+  const [cities, setCities] = useState([])
+  const [state, setState] = useState(undefined)
 
-  const genders = {
-    "F": "Feminino",
-    "M": "Masculino",
-    "O": "Outro",
+  const [formPerfil] = Form.useForm()
+  const [formPassword] = Form.useForm()
+  const [formPhone] = Form.useForm()
+  const [formLocation] = Form.useForm()
+
+  const getStates = async () => {
+    const { data } = await ApiLocate.get("/estados/?orderBy=nome")
+
+    setStates(data)
   }
+
+  const getCities = async (id?:Int16Array) => {
+    const stateId = state || id
+    if (state || id) {
+      const { data } = await ApiLocate.get(`/estados/${stateId}/distritos/?orderBy=nome`)
+      setCities(data)
+    }
+  }
+
+  const getUser = async () => {
+    const { data } = await Api.get(`user?email=${email}`)
+
+    formPerfil.setFieldsValue({
+      first_name: data.first_name.toUpperCase(),
+      last_name: data.last_name.toUpperCase(),
+      gender: data.gender,
+      identity_number: data.identity_number,
+    });
+
+    formPhone.setFieldsValue({
+      cell_phone: data.phone
+    });
+
+    setState(data.state)
+
+    formLocation.setFieldsValue({
+      state: data.state,
+      city: data.city
+    });
+
+  }
+
+  const handleFinishPerfil = async (e: any) => {
+    try {
+      const data = {
+        first_name: e.first_name.toLowerCase(),
+        last_name: e.last_name.toLowerCase(),
+        gender: e.gender,
+        identity_number: e.identity_number,
+        email
+      }
+
+      await Api.put("user/update", data)
+
+      formPerfil.setFieldsValue({
+        first_name: data.first_name.toUpperCase(),
+        last_name: data.last_name.toUpperCase(),
+        gender: data.gender,
+        identity_number: data.identity_number,
+      });
+
+      setUserU({ ...getUserLocalStorage(), first_name: e.first_name.toLowerCase() });
+
+      message.success("Informações atualizadas!")
+
+      setEditPersonalInfo(false)
+    } catch (error) {
+      message.error("Erro ao atualizar informações!")
+    }
+  }
+
+  const handleFinishPhone = async (e: any) => {
+    try {
+      const data = {
+        phone: e.cell_phone,
+        email
+      }
+
+      await Api.put("user/update", data)
+
+      formPhone.setFieldsValue({
+        cell_phone: data.phone,
+      });
+
+      message.success("Informações atualizadas!")
+
+      setEditCellPhoneInfo(false)
+    } catch (error) {
+      message.error("Erro ao atualizar informações!")
+    }
+  }
+
+  const handleFinishLocation = async (e: any) => {
+    try {
+      const data = {
+        state: e.state,
+        city: e.city,
+        email
+      }
+
+      await Api.put("user/update", data)
+
+      formLocation.setFieldsValue({
+        state: data.state,
+        city: data.city,
+      });
+
+      message.success("Informações atualizadas!")
+
+      setEditAddressInfo(false)
+    } catch (error) {
+      message.error("Erro ao atualizar informações!")
+    }
+  }
+
+  const handleFinishPassword = async (e: any) => {
+    try {
+      const data = {
+        email,
+        password: e.password
+      }
+
+      await Api.put("auth/update-password", data)
+
+      message.success("Informações atualizadas!")
+
+      setEditPassword(false)
+    } catch (error) {
+      message.error("Erro ao atualizar informações!")
+    }
+  }
+
+  useEffect(() => {
+    try {
+      getUser()
+      getStates()
+    } catch (error) {
+
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      getCities()
+    } catch (error) {
+
+    }
+  }, [state])
 
   return (
     <>
@@ -23,6 +173,7 @@ export const Profile = () => {
           <h1 style={{ color: "#6C6969", fontSize: "16pt" }}>Meu perfil</h1>
         </Col>
       </Row>
+
       <Row gutter={[20, 20]}>
         <Col xs={{ span: 24 }} sm={{ span: 24 }} md={{ span: 12 }} lg={{ span: 12 }} xl={{ span: 12 }} xxl={{ span: 24 }}>
           <Row gutter={[20, 20]}>
@@ -33,23 +184,30 @@ export const Profile = () => {
                 </Row>
               }>
 
-                <Form layout={"vertical"}
-                  initialValues={{
-                    name: "Leonardo Gomes Assunção",
-                    identity_number: "079.168.468.42",
-                    gender: genders["M"],
-                  }}
-                >
-                  <Form.Item name={"name"} label={"Nome"}>
+                <Form
+                  name="perfil"
+                  initialValues={{ ...formPerfil.getFieldsValue() }}
+                  form={formPerfil}
+                  layout={"vertical"}
+                  onFinish={handleFinishPerfil}>
+                  <Form.Item name={"first_name"} label={"Primeiro nome"}
+                    rules={[{ required: true, message: 'Preencha o campo!' }]}
+                  >
                     <Input disabled={!editPersonalInfo} />
                   </Form.Item>
 
-                  <Form.Item name={"identity_number"} label={"CPF"}>
+                  <Form.Item name={"last_name"} label={"Sobrenome"}
+                    rules={[{ required: true, message: 'Preencha o campo!' }]}>
+                    <Input disabled={!editPersonalInfo} />
+                  </Form.Item>
+
+                  <Form.Item name={"identity_number"} label={"CPF"}
+                    rules={[{ required: true, message: 'Preencha o campo!' }]}
+                  >
                     <Input disabled={!editPersonalInfo} />
                   </Form.Item>
 
                   <Form.Item name={"gender"} label={"Gênero"}>
-                    {/* <Input disabled={!editPersonalInfo} /> */}
                     <Select disabled={!editPersonalInfo} >
                       <Option value="M">Masculino</Option>
                       <Option value="F">Feminino</Option>
@@ -67,7 +225,7 @@ export const Profile = () => {
                       </Col>
 
                       <Col>
-                        <Button hidden={!editPersonalInfo} onClick={() => setEditPersonalInfo(false)} type={"primary"}>Salvar</Button>
+                        <Button hidden={!editPersonalInfo} htmlType="submit" type={"primary"}>Salvar</Button>
                       </Col>
                     </Row>
                   </Form.Item>
@@ -78,23 +236,19 @@ export const Profile = () => {
             <Col span={24}>
               <Card hoverable>
                 <Form
-                  layout={"vertical"}
-                  initialValues={{
-                    email: "leonardo-assuncao1@hotmail.com"
-                  }}>
+                  name="password"
+                  form={formPassword}
+                  onFinish={handleFinishPassword}
+                  layout={"vertical"}>
 
                   <Divider orientation="left">Configurações de Conta</Divider>
 
-                  <Form.Item name={"email"} label={"E-mail"}>
-                    <Input disabled={!editAccountInfo} />
-                  </Form.Item>
-
-                  <Form.Item hidden={editAccountInfo} name={"password"} label={"Senha"}>
-                    <Input.Password disabled={!editAccountInfo} />
+                  <Form.Item hidden={editPassword} name={"password"} label={"Senha"}>
+                    <Input.Password disabled={!editPassword} />
                   </Form.Item>
 
                   <Form.Item
-                    hidden={!editAccountInfo}
+                    hidden={!editPassword}
                     name="password"
                     label={"Nova senha"}
                     rules={[
@@ -109,7 +263,7 @@ export const Profile = () => {
                   </Form.Item>
 
                   <Form.Item
-                    hidden={!editAccountInfo}
+                    hidden={!editPassword}
                     name="confirm"
                     label={"Repita a senha"}
                     dependencies={['password']}
@@ -129,14 +283,14 @@ export const Profile = () => {
                   </Form.Item>
 
                   <Form.Item >
-                    <Row justify={"end"} gutter={editAccountInfo ? 10 : 0}>
+                    <Row justify={"end"} gutter={editPassword ? 10 : 0}>
                       <Col>
-                        <Button hidden={editAccountInfo} onClick={() => setEditAccountInfo(true)} type={"primary"}>Editar campos</Button>
+                        <Button hidden={editPassword} onClick={() => setEditPassword(true)} type={"primary"}>Editar campos</Button>
                       </Col>
                       <Col>
                         <Button
-                          hidden={!editAccountInfo}
-                          onClick={() => { setEditAccountInfo(false) }}
+                          hidden={!editPassword}
+                          onClick={() => { setEditPassword(false) }}
                           htmlType="reset"
                           type={"ghost"}>
                           Cancelar
@@ -144,7 +298,7 @@ export const Profile = () => {
                       </Col>
 
                       <Col>
-                        <Button htmlType="submit" hidden={!editAccountInfo} type={"primary"}>Salvar</Button>
+                        <Button htmlType="submit" hidden={!editPassword} type={"primary"}>Salvar</Button>
                       </Col>
                     </Row>
                   </Form.Item>
@@ -160,25 +314,39 @@ export const Profile = () => {
               <Card hoverable>
                 <Form
                   layout="vertical"
-                  initialValues={{
-                    state: "Rio Grande do Sul",
-                    city: "Canoas",
-                    district: "Estância Velha"
-                  }}
+                  name="location"
+                  form={formLocation}
+                  initialValues={{ ...formLocation.getFieldsValue() }}
+                  onFinish={handleFinishLocation}
                 >
 
                   <Divider orientation="left">Endereço</Divider>
 
-                  <Form.Item name="state" label="Estado">
-                    <Input disabled={!editAddressInfo} />
+                  <Form.Item
+                    name={"state"} label={"Estado"}>
+                    <Select
+                      disabled={!editAddressInfo}
+                      onChange={(e: any) => setState(e)}
+                    >
+                      {states && states.map(({ id, sigla, nome }) => {
+                        return (
+                          <Option value={id}>{sigla} - {nome}</Option>
+                        )
+                      })}
+                    </Select>
                   </Form.Item>
 
-                  <Form.Item name="city" label="Cidade">
-                    <Input disabled={!editAddressInfo} />
-                  </Form.Item>
-
-                  <Form.Item name="district" label="Bairro">
-                    <Input disabled={!editAddressInfo} />
+                  <Form.Item
+                    name={"city"} label={"Cidade"}>
+                    <Select
+                      disabled={!editAddressInfo}
+                    >
+                      {cities && cities.map(({ id, nome }) => {
+                        return (
+                          <Option value={id}>{nome}</Option>
+                        )
+                      })}
+                    </Select>
                   </Form.Item>
 
                   <Form.Item >
@@ -205,13 +373,15 @@ export const Profile = () => {
                 </Form>
               </Card>
             </Col>
+
             <Col span={24}>
               <Card hoverable>
                 <Form
+                  name="formPhone"
                   layout="vertical"
-                  initialValues={{
-                    cell_phone: "984346437"
-                  }}>
+                  form={formPhone}
+                  onFinish={handleFinishPhone}
+                  initialValues={{ ...formPhone.getFieldsValue() }}>
                   <Divider orientation="left">Contato</Divider>
 
                   <Form.Item name="cell_phone" label="Telefone">

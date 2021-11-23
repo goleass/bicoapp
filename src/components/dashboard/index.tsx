@@ -90,7 +90,7 @@ function Dashboard() {
                 {collapsed && <div className="logo-header"> BicoApp</div>}
               </Col>
               <Col>
-                {<div className="wellcome-header">Olá, Leonardo</div>}
+                {<div className="wellcome-header">Olá, {auth.first_name}</div>}
               </Col>
             </Row>
 

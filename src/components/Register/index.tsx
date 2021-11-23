@@ -54,7 +54,7 @@ export const Register = () => {
                   fontSize: 35
                 }}
               >
-                Login
+                Cadastrar
               </Form.Item>
             </Col>
           </Row>
