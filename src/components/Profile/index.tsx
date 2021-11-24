@@ -1,14 +1,17 @@
-import { Select, Avatar, Card, Col, Row, Form, Input, Divider, Descriptions, Button, message } from "antd"
+import { Select, Avatar, Card, Col, Row, Form, Input, Divider, Descriptions, Button, message, Image } from "antd"
 import { UserOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthProvider/useAuth"
 import { Api, ApiLocate } from "../../services/api"
 import { getUserLocalStorage } from "../../context/AuthProvider/util";
 
+import './style.css'
+
 const { Option } = Select
 
 export const Profile = () => {
   const { email, setUserU } = useAuth()
+  const [editAvatar, setEditAvatar] = useState(false)
   const [editPersonalInfo, setEditPersonalInfo] = useState(false)
   const [editPassword, setEditPassword] = useState(false)
   const [editAddressInfo, setEditAddressInfo] = useState(false)
@@ -16,7 +19,9 @@ export const Profile = () => {
   const [states, setStates] = useState([])
   const [cities, setCities] = useState([])
   const [state, setState] = useState(undefined)
+  const [avatar, setAvatar] = useState("")
 
+  const [formAvatar] = Form.useForm()
   const [formPerfil] = Form.useForm()
   const [formPassword] = Form.useForm()
   const [formPhone] = Form.useForm()
@@ -28,7 +33,7 @@ export const Profile = () => {
     setStates(data)
   }
 
-  const getCities = async (id?:Int16Array) => {
+  const getCities = async (id?: Int16Array) => {
     const stateId = state || id
     if (state || id) {
       const { data } = await ApiLocate.get(`/estados/${stateId}/distritos/?orderBy=nome`)
@@ -51,6 +56,7 @@ export const Profile = () => {
     });
 
     setState(data.state)
+    setAvatar(data.avatar_url)
 
     formLocation.setFieldsValue({
       state: data.state,
@@ -149,6 +155,30 @@ export const Profile = () => {
     }
   }
 
+  const handleClickAvatar = async () => {
+    setEditAvatar(false)
+    try {
+      const url_avatar = formAvatar.getFieldValue("url_avatar")
+
+      if (!url_avatar) return
+
+      const data = {
+        avatar_url: url_avatar,
+        email
+      }
+
+      await Api.put("user/update", data)
+
+      setAvatar(url_avatar)
+
+      setEditCellPhoneInfo(false)
+
+      message.success("Informações atualizadas!")
+    } catch (error) {
+      message.error("Erro ao atualizar informações!")
+    }
+  }
+
   useEffect(() => {
     try {
       getUser()
@@ -179,9 +209,44 @@ export const Profile = () => {
           <Row gutter={[20, 20]}>
             <Col span={24}>
               <Card hoverable title={
-                <Row>
-                  <Col span={1}><Avatar size={100} icon={<UserOutlined />} /></Col>
+                <Row gutter={[10, 10]}>
+                  <Col span={24}>
+                    <div hidden={!avatar} className="profilepic">
+                      <img className="profilepic__image" src={avatar} width="120" height="120" alt="Profibild" />
+                      <div className="profilepic__content" onClick={() => setEditAvatar(true)}>
+                        <span className="profilepic__text">Editar</span>
+                      </div>
+                    </div>
+
+                    {!avatar && <Avatar size={120} icon={
+                      <div className="profilepic-notimage">
+                        <UserOutlined className="profilepic__image" />
+                        <div className="profilepic__content" onClick={() => setEditAvatar(true)}>
+                          <span className="profilepic__text">Editar</span>
+                        </div>
+                      </div>
+                    } />}
+                  </Col>
+                  <Col span={24}>
+                    <Form hidden={!editAvatar} form={formAvatar} layout="vertical">
+                      <Form.Item name="url_avatar" label="Url do Avatar">
+                        <Input />
+                      </Form.Item>
+                      <Form.Item>
+                        <Row justify={"end"} gutter={10}>
+                          <Col>
+                            <Button onClick={() => setEditAvatar(false)} type={"ghost"}>Cancelar</Button>
+                          </Col>
+
+                          <Col>
+                            <Button onClick={() => handleClickAvatar()} type={"primary"}>Salvar</Button>
+                          </Col>
+                        </Row>
+                      </Form.Item>
+                    </Form>
+                  </Col>
                 </Row>
+
               }>
 
                 <Form
