@@ -54,9 +54,13 @@ var typeExperience = {
   m: "mes(es)"
 }
 
+interface ISkill {
+  id: string;
+}
+
 export const Skill = () => {
   const { email } = useAuth()
-  const [skills, setSkills] = useState([{}]);
+  const [skills, setSkills] = useState<ISkill[]>([])
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [tExperience, setTExperience] = useState("y");
   const [loading, setLoading] = useState(false)
@@ -204,7 +208,7 @@ export const Skill = () => {
         justify={skills.length === 0 ? "center" : "start"}
       >
         {loading && <Spin size="large" />}
-        {!loading && skills.length == 0 &&
+        {!loading && (skills.length==0) &&
           <Col>
             <Empty description="Nada cadastrado ainda" />
           </Col>

@@ -209,8 +209,8 @@ export const Profile = () => {
           <Row gutter={[20, 20]}>
             <Col span={24}>
               <Card hoverable title={
-                <Row gutter={[10, 10]}>
-                  <Col span={24}>
+                <Row gutter={[10, 10]} justify="center">
+                  <Col span={12} className="iii">
                     <div hidden={!avatar} className="profilepic">
                       <img className="profilepic__image" src={avatar} width="120" height="120" alt="Profibild" />
                       <div className="profilepic__content" onClick={() => setEditAvatar(true)}>
@@ -218,7 +218,7 @@ export const Profile = () => {
                       </div>
                     </div>
 
-                    {!avatar && <Avatar size={120} icon={
+                    {!avatar && <Avatar size={80} icon={
                       <div className="profilepic-notimage">
                         <UserOutlined className="profilepic__image" />
                         <div className="profilepic__content" onClick={() => setEditAvatar(true)}>
@@ -227,6 +227,7 @@ export const Profile = () => {
                       </div>
                     } />}
                   </Col>
+
                   <Col span={24}>
                     <Form hidden={!editAvatar} form={formAvatar} layout="vertical">
                       <Form.Item name="url_avatar" label="Url do Avatar">
@@ -246,7 +247,6 @@ export const Profile = () => {
                     </Form>
                   </Col>
                 </Row>
-
               }>
 
                 <Form

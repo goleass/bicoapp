@@ -1,15 +1,15 @@
 .profilepic {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   overflow: hidden;
   background-color: #111;
 }
 .profilepic-notimage {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   overflow: hidden;
   /* background-color: #111; */
@@ -26,6 +26,10 @@
 .profilepic-notimage:hover .profilepic__content {
   background-color: #575555;
   opacity: 1;
+}
+
+.iii {
+  text-align: -webkit-center;
 }
 
 .profilepic-notimage:hover .profilepic__image {

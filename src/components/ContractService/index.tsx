@@ -17,7 +17,7 @@ export const ContractService = () => {
     try {
       setLoading(true)
       if (!e) {
-        const { data: services } = await Api.get(`skill/all`)
+        const { data: services } = await Api.get(`skill`)
         setServices([...services])
         setLoading(false)
       }
@@ -46,7 +46,6 @@ export const ContractService = () => {
   return (
     <>
       <Row gutter={[20, 10]}>
-
         <Col span={24}>
           <Row >
             <Col span={24}>
@@ -80,7 +79,8 @@ export const ContractService = () => {
             {services && services[0] &&
               services.map((service: any) => {
                 return (
-                  <Col span={8} key={service.id}>
+                  <Col xs={{ span: 24 }} sm={{ span: 16 }} md={{ span: 12 }} lg={{ span: 12 }} xl={{ span: 8 }} xxl={{ span: 8 }} 
+                  key={service.id}>
                     <CardPerfil
                       first_name={service.User.first_name}
                       last_name={service.User.last_name}

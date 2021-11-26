@@ -45,13 +45,14 @@ export const CardPerfil = ({ avatar, first_name, last_name, cityId, title, exper
 
   return (
     <Card
+      headStyle={{}}
       hoverable
       title={
-        <Row gutter={25}>
-          <Col span={8}>
+        <Row gutter={25} justify="start" >
+          <Col xs={{ span: 6 }} sm={{ span: 8 }} md={{ span: 8 }} lg={{ span: 8 }} xl={{ span: 6 }} xxl={{ span: 6 }}>
             <Avatar size={50} src={avatar} icon={<UserOutlined />} />
           </Col>
-          <Col span={16}>
+          <Col xs={{ span: 12 }} sm={{ span: 16 }} md={{ span: 16 }} lg={{ span: 8 }} xl={{ span: 6 }} xxl={{ span: 6 }}>
             <Row>
               <Col>
                 <div style={{ fontSize: '10pt', fontWeight: 'bold', wordBreak: 'break-word', wordWrap: 'break-word', whiteSpace: 'pre-wrap' }}>
