@@ -4,9 +4,13 @@ import { useEffect, useState } from 'react';
 import { Api } from '../../services/api';
 const { Search } = Input;
 
+interface IService {
+  id: string;
+}
+
 export const ContractService = () => {
 
-  const [services, setServices] = useState([{}])
+  const [services, setServices] = useState<IService[]>([])
   const [loading, setLoading] = useState(false)
 
   const getServices = async (e: string = "") => {
@@ -73,7 +77,7 @@ export const ContractService = () => {
                 <Empty description="Nenhum resultado" />
               </Col>
             }
-            {services &&
+            {services && services[0] &&
               services.map((service: any) => {
                 return (
                   <Col span={8} key={service.id}>
