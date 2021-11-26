@@ -11,7 +11,7 @@ export const ApiLocate = axios.create({
 })
 
 Api.interceptors.request.use(
-  (config) => {
+  (config:any) => {
     const user = getUserLocalStorage()
 
     const token = `Barer ${user?.token}`
