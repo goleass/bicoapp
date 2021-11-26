@@ -73,7 +73,7 @@ export const Register = () => {
                 // label="Último nome"
                 rules={[{ required: true, message: 'Preencha o campo!' }]}
               >
-                <Input prefix={<ContactsOutlined />} placeholder="Último nome" />
+                <Input prefix={<ContactsOutlined />} placeholder="Sobrenome" />
               </Form.Item>
             </Col>
           </Row>

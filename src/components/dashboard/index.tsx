@@ -13,6 +13,7 @@ import { Profile } from '../Profile';
 import { ContractService } from '../ContractService';
 import { Skill } from '../Skill';
 import { Footer } from 'antd/lib/layout/layout';
+import { capitalize } from '../../helpers/functions';
 
 const { Header, Sider, Content } = Layout;
 
@@ -90,7 +91,7 @@ function Dashboard() {
                 {collapsed && <div className="logo-header"> BicoApp</div>}
               </Col>
               <Col>
-                {<div className="wellcome-header">Olá, {auth.first_name}</div>}
+                {<div className="wellcome-header">Olá, {capitalize(auth.first_name)}</div>}
               </Col>
             </Row>
 
@@ -98,7 +99,7 @@ function Dashboard() {
         </Affix>
         <Content
           className="site-layout-background-content"
-          style={{ margin: '16px 16px 0', padding: 10, minHeight: 600 }}
+          style={{ margin: '16px 16px 0', padding: 24, minHeight: 600 }}
         >
           <Teste componentKey={menuKey} />
         </Content>

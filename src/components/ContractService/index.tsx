@@ -1,24 +1,44 @@
-import { Avatar, Button, Card, Col, Divider, Input, Row } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { Col, Divider, Empty, Input, message, Row } from 'antd';
 import { CardPerfil } from '../CardPerfil';
+import { useEffect, useState } from 'react';
+import { Api } from '../../services/api';
 const { Search } = Input;
 
-const dados = [
-  {
-    nome: "Pedro",
-    local: "Porto Alegre/RS",
-    profissao: "Marceneiro",
-    experiencia: "2 anos"
-  },
-  {
-    nome: "Joao",
-    local: "Canoas/RS",
-    profissao: "Ferreiro",
-    experiencia: "1 anos"
-  }
-]
-
 export const ContractService = () => {
+
+  const [services, setServices] = useState([{}])
+  const [loading, setLoading] = useState(false)
+
+  const getServices = async (e: string = "") => {
+    try {
+      setLoading(true)
+      if (!e) {
+        const { data: services } = await Api.get(`skill/all`)
+        setServices([...services])
+        setLoading(false)
+      }
+      else {
+        const { data: services } = await Api.get(`skill/?title=${e.toLowerCase()}`)
+        if (services.error) {
+          message.info("Nenhum resultado encontrado")
+          setServices([])
+          setLoading(false)
+        }
+        else {
+          setServices([...services])
+          setLoading(false)
+        }
+      }
+
+    } catch (error) {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getServices()
+  }, [])
+
   return (
     <>
       <Row gutter={[20, 10]}>
@@ -26,14 +46,14 @@ export const ContractService = () => {
         <Col span={24}>
           <Row >
             <Col span={24}>
-            <h1 style={{ color: "#6C6969", fontSize: "16pt" }}>Contratar serviço</h1>
+              <h1 style={{ color: "#6C6969", fontSize: "16pt" }}>Contratar serviço</h1>
             </Col>
           </Row>
         </Col>
         <Col span={24}>
           <Row >
             <Col span={24}>
-              <Search placeholder="O que você procura? Ex: Eletricista, manicure" enterButton="Pesquisar" size="large" />
+              <Search onSearch={(e) => getServices(e)} placeholder="O que você procura? Ex: Eletricista, manicure" enterButton="Pesquisar" size="large" loading={loading} />
             </Col>
           </Row>
         </Col>
@@ -47,19 +67,28 @@ export const ContractService = () => {
         </Col>
 
         <Col span={24}>
-          <Row gutter={[10, 10]}>
-
-            {
-              dados.map(pessoa => {
+          <Row justify={services.length === 0 ? "center" : "start"} gutter={[10, 10]}>
+            {services.length === 0 &&
+              <Col>
+                <Empty description="Nenhum resultado" />
+              </Col>
+            }
+            {services &&
+              services.map((service: any) => {
                 return (
-                  <Col span={8}>
-                    <CardPerfil nome={pessoa.nome} local={pessoa.local} profissao={pessoa.profissao} experiencia={pessoa.experiencia} />
+                  <Col span={8} key={service.id}>
+                    <CardPerfil
+                      first_name={service.User.first_name}
+                      last_name={service.User.last_name}
+                      avatar={service.User.avatar_url}
+                      cityId={service.User.city}
+                      title={service.title}
+                      type_experience={service.type_experience}
+                      experience={service.experience} />
                   </Col>
                 )
               })
             }
-
-
           </Row>
         </Col>
       </Row>
