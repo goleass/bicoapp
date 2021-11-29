@@ -6,10 +6,12 @@ import { Api, ApiLocate } from "../../services/api"
 import { getUserLocalStorage } from "../../context/AuthProvider/util";
 
 import './style.css'
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select
 
 export const Profile = () => {
+  const navigate = useNavigate()
   const { email, setUserU } = useAuth()
   const [editAvatar, setEditAvatar] = useState(false)
   const [editPersonalInfo, setEditPersonalInfo] = useState(false)
@@ -42,26 +44,41 @@ export const Profile = () => {
   }
 
   const getUser = async () => {
-    const { data } = await Api.get(`user?email=${email}`)
+    try {
+      const request = await Api.get(`user?email=${email}`)
 
-    formPerfil.setFieldsValue({
-      first_name: data.first_name.toUpperCase(),
-      last_name: data.last_name.toUpperCase(),
-      gender: data.gender,
-      identity_number: data.identity_number,
-    });
+      const { data } = request
 
-    formPhone.setFieldsValue({
-      cell_phone: data.phone
-    });
+      console.log(data.status)
 
-    setState(data.state)
-    setAvatar(data.avatar_url)
+      formPerfil.setFieldsValue({
+        first_name: data.first_name.toUpperCase(),
+        last_name: data.last_name.toUpperCase(),
+        gender: data.gender,
+        identity_number: data.identity_number,
+      });
 
-    formLocation.setFieldsValue({
-      state: data.state,
-      city: data.city
-    });
+      formPhone.setFieldsValue({
+        cell_phone: data.phone
+      });
+
+      setState(data.state)
+      setAvatar(data.avatar_url)
+
+      formLocation.setFieldsValue({
+        state: data.state,
+        city: data.city
+      });
+    } catch (error) {
+
+      if (!error || !error.response) {
+        message.error("Erro interno, tente mais tarde!")
+      }
+      else {
+        if (error.response.status === 401) navigate('/login')
+        else console.error("Erro interno, tente mais tarde!")
+      }
+    }
 
   }
 

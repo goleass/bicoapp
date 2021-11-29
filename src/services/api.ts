@@ -1,9 +1,9 @@
 import axios from "axios";
-import { getUserLocalStorage } from "../context/AuthProvider/util";
+import { getUserLocalStorage, setUserLocalStorage } from "../context/AuthProvider/util";
 
 export const Api = axios.create({
-  baseURL: "https://bico-app-api.herokuapp.com/"
-  // baseURL: "http://localhost:3001/"
+  // baseURL: "https://bico-app-api.herokuapp.com/"
+  baseURL: "http://localhost:3001/"
 })
 
 export const ApiLocate = axios.create({
@@ -11,7 +11,7 @@ export const ApiLocate = axios.create({
 })
 
 Api.interceptors.request.use(
-  (config:any) => {
+  (config: any) => {
     const user = getUserLocalStorage()
 
     const token = `Barer ${user?.token}`
@@ -20,7 +20,15 @@ Api.interceptors.request.use(
 
     return config
   },
+  (error) => { return Promise.reject(error) }
+)
+
+Api.interceptors.response.use(
+  (data) => { return data },
   (error) => {
+    if(error.response.status === 401){
+      setUserLocalStorage(null)
+    }
     return Promise.reject(error)
   }
-)
+);

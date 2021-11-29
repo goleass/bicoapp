@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Api } from '../../services/api';
 import { useForm } from 'antd/lib/form/Form';
 const { Search } = Input;
+import { useNavigate } from "react-router-dom";
 
 interface IService {
   id: string;
@@ -11,11 +12,16 @@ interface IService {
 
 export const ContractService = () => {
 
+  const navigate = useNavigate()
   const [services, setServices] = useState<IService[]>([])
   const [loading, setLoading] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [formContact] = useForm()
+
+  useEffect(() => {
+    getServices()
+  }, [])
 
   const getServices = async (e: string = "") => {
     try {
@@ -40,6 +46,14 @@ export const ContractService = () => {
 
     } catch (error) {
       setLoading(false)
+
+      if (!error || !error.response) {
+        message.error("Erro interno, tente mais tarde!")
+      }
+      else {
+        if (error.response.status === 401) navigate('/login')
+        else console.error("Erro interno, tente mais tarde!")
+      }
     }
   }
 
@@ -65,10 +79,6 @@ export const ContractService = () => {
   const handleCancel = () => {
     closeModal()
   }
-
-  useEffect(() => {
-    getServices()
-  }, [])
 
   return (
     <>

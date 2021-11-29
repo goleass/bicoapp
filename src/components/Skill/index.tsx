@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthProvider/useAuth";
 import { Api } from "../../services/api";
 import { capitalize } from "../../helpers/functions";
+import { useNavigate } from "react-router-dom";
 
 interface ICardSkill {
   id: string;
@@ -69,6 +70,7 @@ interface ISkill {
 }
 
 export const Skill = () => {
+  const navigate = useNavigate()
   const { email } = useAuth()
   const [skills, setSkills] = useState<ISkill[]>([])
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -77,6 +79,10 @@ export const Skill = () => {
   const [idEdit, setIdEdit] = useState("")
 
   const [formSkill] = Form.useForm()
+
+  useEffect(() => {
+    getSkills()
+  }, [])
 
   const selectAfter = (
     <Select defaultActiveFirstOption onChange={(e: string) => setTExperience(e)} value={tExperience} defaultValue="Anos" style={{ width: 90 }}>
@@ -123,6 +129,13 @@ export const Skill = () => {
       setLoading(false)
     } catch (error) {
       setLoading(false)
+      if (!error || !error.response) {
+        message.error("Erro interno, tente mais tarde!")
+      }
+      else {
+        if (error.response.status === 401) navigate('/login')
+        else console.error("Erro interno, tente mais tarde!")
+      }
     }
   }
 
@@ -150,8 +163,8 @@ export const Skill = () => {
         setSkills([skill, ...skills])
       else setSkills([skill])
     } else {
-      const { data: skill } = await Api.put("skill/update", {...data, id})
-      setSkills([...skills.filter(skill => skill.id !=id), skill])
+      const { data: skill } = await Api.put("skill/update", { ...data, id })
+      setSkills([...skills.filter(skill => skill.id != id), skill])
       console.log(skill)
     }
 
@@ -192,10 +205,6 @@ export const Skill = () => {
     setTExperience(skill.type_experience)
     setIdEdit(id)
   }
-
-  useEffect(() => {
-    getSkills()
-  }, [])
 
   return (
     <>
