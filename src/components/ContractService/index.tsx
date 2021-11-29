@@ -44,7 +44,7 @@ export const ContractService = () => {
         }
       }
 
-    } catch (error) {
+    } catch (error:any) {
       setLoading(false)
 
       if (!error || !error.response) {
@@ -59,8 +59,6 @@ export const ContractService = () => {
 
   const handleContact = (email: string) => {
     showModal()
-
-    console.log(email)
   }
 
   const showModal = () => {
@@ -89,7 +87,7 @@ export const ContractService = () => {
           form={formContact}
           name="form_skill"
           layout="vertical"
-          onFinish={handleSubmit}>
+          onFinish={() => handleSubmit()}>
 
           <Form.Item label="Titulo da mensagem" name="title" rules={[{ required: true, message: 'Preencha o campo!' }]}>
             <Input placeholder="Desejo saber mais!" />

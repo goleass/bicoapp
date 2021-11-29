@@ -127,7 +127,7 @@ export const Skill = () => {
 
       setSkills(skills.data)
       setLoading(false)
-    } catch (error) {
+    } catch (error:any) {
       setLoading(false)
       if (!error || !error.response) {
         message.error("Erro interno, tente mais tarde!")

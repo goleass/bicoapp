@@ -69,7 +69,7 @@ export const Profile = () => {
         state: data.state,
         city: data.city
       });
-    } catch (error) {
+    } catch (error:any) {
 
       if (!error || !error.response) {
         message.error("Erro interno, tente mais tarde!")
