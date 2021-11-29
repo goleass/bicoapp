@@ -229,7 +229,7 @@ export const Profile = () => {
                 <Row gutter={[10, 10]} justify="center">
                   <Col span={12} className="iii">
                     <div hidden={!avatar} className="profilepic">
-                      <img className="profilepic__image" src={avatar} width="120" height="120" alt="Profibild" />
+                      <img className="profilepic__image" src={avatar} width="100" height="100" alt="Profibild" />
                       <div className="profilepic__content" onClick={() => setEditAvatar(true)}>
                         <span className="profilepic__text">Editar</span>
                       </div>
