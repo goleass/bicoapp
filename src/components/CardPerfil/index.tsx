@@ -12,7 +12,10 @@ interface ICardPerfil {
   cityId: Number;
   title: string;
   experience: Number;
+  description: string;
+  email: string;
   type_experience: "y" | "m";
+  handleContact: (email: string) => void;
 }
 
 interface ILocal {
@@ -25,9 +28,9 @@ var typeExperience = {
   m: "mes(es)"
 }
 
-export const CardPerfil = ({ avatar, first_name, last_name, cityId, title, experience, type_experience }: ICardPerfil) => {
+export const CardPerfil = ({ avatar, email, first_name, last_name, cityId, title, experience, type_experience, description, handleContact }: ICardPerfil) => {
 
-  const [local, setLocal] = useState({state:"",city:""})
+  const [local, setLocal] = useState({ state: "", city: "" })
 
   const getLocal = async (id: any) => {
     const { data } = await ApiLocate.get(`distritos/${id}`)
@@ -49,10 +52,10 @@ export const CardPerfil = ({ avatar, first_name, last_name, cityId, title, exper
       hoverable
       title={
         <Row gutter={25} justify="start" >
-          <Col xs={{ span: 6 }} sm={{ span: 8 }} md={{ span: 8 }} lg={{ span: 8 }} xl={{ span: 6 }} xxl={{ span: 6 }}>
+          <Col xs={{ span: 6 }} sm={{ span: 6 }} md={{ span: 6 }} lg={{ span: 5 }} xl={{ span: 4 }} xxl={{ span: 6 }}>
             <Avatar size={50} src={avatar} icon={<UserOutlined />} />
           </Col>
-          <Col xs={{ span: 12 }} sm={{ span: 16 }} md={{ span: 16 }} lg={{ span: 8 }} xl={{ span: 6 }} xxl={{ span: 6 }}>
+          <Col xs={{ span: 16 }} sm={{ span: 10 }} md={{ span: 16 }} lg={{ span: 10 }} xl={{ span: 12 }} xxl={{ span: 6 }}>
             <Row>
               <Col>
                 <div style={{ fontSize: '10pt', fontWeight: 'bold', wordBreak: 'break-word', wordWrap: 'break-word', whiteSpace: 'pre-wrap' }}>
@@ -70,7 +73,7 @@ export const CardPerfil = ({ avatar, first_name, last_name, cityId, title, exper
       }>
       <Row justify="space-between">
         <Col>
-          <p>{capitalize(title)}</p>
+          <p style={{fontWeight:"bold", fontSize:16}}>{capitalize(title)}</p>
         </Col>
         <Col>
           <Tag color="#f50">{experience} {typeExperience[type_experience]} de experiência</Tag>
@@ -79,7 +82,13 @@ export const CardPerfil = ({ avatar, first_name, last_name, cityId, title, exper
 
       <Row>
         <Col span={24}>
-          <Button block size="small" >Entrar em contato</Button>
+          <p>{description}</p>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col span={24}>
+          <Button block size="small" onClick={() => handleContact(email)} >Entrar em contato</Button>
         </Col>
       </Row>
     </Card>

@@ -54,10 +54,6 @@ function Dashboard() {
       <Sider
         breakpoint="md"
         collapsedWidth="0px"
-
-        onBreakpoint={broken => {
-          console.log(broken);
-        }}
         onCollapse={(collapsed, type) => {
           setCollapsed(collapsed)
         }}
@@ -71,9 +67,9 @@ function Dashboard() {
             <Menu.Item key="1" onClick={handleClick} icon={<UserOutlined />}>
               Contratar serviço
             </Menu.Item>
-            <Menu.Item key="2" onClick={handleClick} icon={<UserOutlined />}>
+            {/* <Menu.Item key="2" onClick={handleClick} icon={<UserOutlined />}>
               Meus serviços
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item key="3" onClick={handleClick} icon={<OrderedListOutlined />} >
               Habilidades
             </Menu.Item>

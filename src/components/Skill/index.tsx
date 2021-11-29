@@ -1,41 +1,47 @@
-import { Button, Card, Select, Col, Dropdown, Row, Menu, Modal, Form, Input, InputNumber, Empty, Spin, Divider } from "antd"
+import { Button, Card, Select, Col, Dropdown, Row, Menu, Modal, Form, Input, InputNumber, Empty, Spin, Divider, message } from "antd"
 
 const { Option } = Select;
 
-import { MoreOutlined, EditFilled, StopOutlined, DeleteOutlined } from '@ant-design/icons';
+import { MoreOutlined, EditFilled, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthProvider/useAuth";
 import { Api } from "../../services/api";
+import { capitalize } from "../../helpers/functions";
 
 interface ICardSkill {
+  id: string;
   title: string;
   description: string;
   experience: Int16Array;
-  type_experience: "y" | "m"
+  type_experience: "y" | "m";
+  handleDelete: (id: string) => void;
+  handleEdit: (id: string) => void;
 }
 
-const menu = (
-  <Menu>
-    <Menu.Item>
-      <a target="_blank">
-        <EditFilled />
-        <span style={{ marginLeft: 5 }}>Editar</span>
-      </a>
-    </Menu.Item>
-    <Menu.Item>
-      <a target="_blank">
-        <StopOutlined />
-        <span style={{ marginLeft: 5 }}>Desativar</span>
-      </a>
-    </Menu.Item>
-    <Menu.Item style={{ color: "red" }}>
-      <a target="_blank">
-        <DeleteOutlined />
-        <span style={{ marginLeft: 5 }}>Excluir</span>
-      </a>
-    </Menu.Item>
-  </Menu>
-);
+const menu = (id: string, handleDelete: (id: string) => void, handleEdit: (id: string) => void) => {
+  return (
+    <Menu>
+      <Menu.Item onClick={() => handleEdit(id)} >
+        <a target="_blank">
+          <EditFilled />
+          <span style={{ marginLeft: 5 }}>Editar</span>
+        </a>
+      </Menu.Item>
+      {/* <Menu.Item>
+        <a target="_blank">
+          <StopOutlined />
+          <span style={{ marginLeft: 5 }}>Desativar</span>
+        </a>
+      </Menu.Item> */}
+      <Menu.Item style={{ color: "red" }} key="0" onClick={() => handleDelete(id)}>
+        <a target="_blank">
+          <DeleteOutlined />
+          <span style={{ marginLeft: 5 }}>Excluir</span>
+        </a>
+      </Menu.Item>
+    </Menu>
+  );
+}
 
 const colorsCard = [
   { "hex": "#45B69C", "fontColor": "#FFF" },
@@ -56,6 +62,10 @@ var typeExperience = {
 
 interface ISkill {
   id: string;
+  title: string;
+  experience: string;
+  description: string;
+  type_experience: "y" | "m";
 }
 
 export const Skill = () => {
@@ -64,17 +74,18 @@ export const Skill = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [tExperience, setTExperience] = useState("y");
   const [loading, setLoading] = useState(false)
+  const [idEdit, setIdEdit] = useState("")
 
   const [formSkill] = Form.useForm()
 
   const selectAfter = (
-    <Select defaultActiveFirstOption onChange={(e: string) => setTExperience(e)} defaultValue="Anos" style={{ width: 90 }}>
+    <Select defaultActiveFirstOption onChange={(e: string) => setTExperience(e)} value={tExperience} defaultValue="Anos" style={{ width: 90 }}>
       <Option value="y">Anos</Option>
       <Option value="m">Meses</Option>
     </Select>
   );
 
-  const CardSkill = ({ title, description, experience, type_experience }: ICardSkill) => {
+  const CardSkill = ({ id, title, description, experience, type_experience, handleDelete, handleEdit }: ICardSkill) => {
     const { hex, fontColor } = colorsCard[Math.floor(Math.random() * colorsCard.length)]
 
     return (<Card
@@ -85,9 +96,9 @@ export const Skill = () => {
       hoverable
       title={
         <Row>
-          <Col span={20} ><span style={{ color: fontColor }}>{title}</span></Col>
+          <Col span={20} ><span style={{ color: fontColor }}>{capitalize(title)}</span></Col>
           <Col span={4}>
-            <Dropdown overlay={menu} placement="bottomRight" arrow>
+            <Dropdown overlay={menu(id, handleDelete, handleEdit)} placement="bottomRight" arrow>
               <Button type="text"><MoreOutlined /></Button>
             </Dropdown>
           </Col>
@@ -104,7 +115,6 @@ export const Skill = () => {
       const skills = await Api.get(`skill/?email=${email}`)
 
       if (skills.data.error) {
-        console.info(skills.data.error)
         setLoading(false)
         return
       }
@@ -120,7 +130,7 @@ export const Skill = () => {
     setIsModalVisible(true);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: any, id: string) => {
     const { title, description, experience } = e
 
     if (!title || !description || !experience) return
@@ -133,13 +143,17 @@ export const Skill = () => {
       experience
     }
 
-    const { data: skill } = await Api.post("skill/new-skill", data)
+    if (!id) {
+      const { data: skill } = await Api.post("skill/new-skill", data)
 
-    console.log(skill)
-
-    if (skills.length > 0)
-      setSkills([skill, ...skills])
-    else setSkills([skill])
+      if (skills.length > 0)
+        setSkills([skill, ...skills])
+      else setSkills([skill])
+    } else {
+      const { data: skill } = await Api.put("skill/update", {...data, id})
+      setSkills([...skills.filter(skill => skill.id !=id), skill])
+      console.log(skill)
+    }
 
     setIsModalVisible(false);
   };
@@ -148,19 +162,50 @@ export const Skill = () => {
     setIsModalVisible(false);
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      if (!id) return
+
+      await Api.delete(`skill/delete/?id=${id}`)
+        .then(() => {
+          setSkills([...skills.filter(skill => skill.id != id)])
+          message.success("Habilidade deletada com sucesso!")
+        })
+
+
+    } catch (error) {
+      message.error("Erro ao deletar habilidade!")
+    }
+  }
+
+  const handleEdit = (id: string) => {
+    showModal()
+
+    const [skill] = skills.filter((skill: any) => skill.id == id)
+
+    formSkill.setFieldsValue({
+      title: capitalize(skill.title),
+      experience: skill.experience,
+      description: skill.description
+    })
+
+    setTExperience(skill.type_experience)
+    setIdEdit(id)
+  }
+
   useEffect(() => {
     getSkills()
   }, [])
 
   return (
     <>
-      <Modal footer={null} closeIcon={true} title="Adicionar Habilidade" visible={isModalVisible}>
+      <Modal destroyOnClose footer={null} closeIcon={true} title="Habilidade" visible={isModalVisible}>
         <Form
           preserve={false}
           form={formSkill}
           name="form_skill"
           layout="vertical"
-          onFinish={handleSubmit}>
+          onFinish={(e: any) => handleSubmit(e, idEdit)}>
 
           <Form.Item label="Titulo" name="title" rules={[{ required: true, message: 'Preencha o campo!' }]}>
             <Input placeholder="Marceneiro" />
@@ -199,7 +244,7 @@ export const Skill = () => {
 
       <Row >
         <Col span={24}>
-          <Divider orientation="left">Suas habilidades</Divider>
+          <Divider orientation="left">Minhas habilidades</Divider>
         </Col>
       </Row>
 
@@ -208,15 +253,23 @@ export const Skill = () => {
         justify={skills.length === 0 ? "center" : "start"}
       >
         {loading && <Spin size="large" />}
-        {!loading && (skills.length==0) &&
+        {!loading && (skills.length == 0) &&
           <Col>
             <Empty description="Nada cadastrado ainda" />
           </Col>
         }
-        {skills.length > 0 && skills.map((skill: any) => {
+        {!loading && skills.length > 0 && skills.map((skill: any) => {
           return (
             <Col xs={{ span: 24 }} sm={{ span: 12 }} md={{ span: 12 }} lg={{ span: 8 }} xl={{ span: 8 }} xxl={{ span: 8 }}>
-              <CardSkill title={skill.title} description={skill.description} experience={skill.experience} type_experience={skill.type_experience} />
+              <CardSkill
+                handleDelete={handleDelete}
+                handleEdit={handleEdit}
+                id={skill.id}
+                title={skill.title}
+                description={skill.description}
+                experience={skill.experience}
+                type_experience={skill.type_experience}
+              />
             </Col>
           )
         })}
